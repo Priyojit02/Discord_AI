@@ -1,5 +1,5 @@
 'use client';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Send, Plus, X, Smile, File as FileIcon, Sparkles, Bot, Zap } from 'lucide-react';
 import { getStompClient } from '@/lib/stomp';
 import api from '@/lib/api';
@@ -40,7 +40,15 @@ export default function ChatInput({
   const [hoveredEmoji, setHoveredEmoji] = useState(false);
   const [hoveredAI, setHoveredAI] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const typingTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  // Auto-reset textarea height back to 1-line when message is cleared or empty
+  useEffect(() => {
+    if (!content && textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+    }
+  }, [content]);
 
   const sendTyping = (typing: boolean) => {
     const client = getStompClient();
@@ -118,6 +126,9 @@ export default function ChatInput({
 
       await onSend(content.trim(), fileUrl, fileName);
       setContent('');
+      if (textareaRef.current) {
+        textareaRef.current.style.height = 'auto';
+      }
       sendTyping(false);
     } catch (err) {
       console.error('Failed to send message', err);
@@ -519,6 +530,7 @@ export default function ChatInput({
 
         {/* Textarea */}
         <textarea
+          ref={textareaRef}
           style={{
             flex: 1,
             backgroundColor: 'transparent',
@@ -526,6 +538,7 @@ export default function ChatInput({
             outline: 'none',
             resize: 'none',
             fontSize: '14.5px',
+            height: 'auto',
             maxHeight: '160px',
             lineHeight: '1.4',
             paddingTop: '4px',
@@ -541,7 +554,9 @@ export default function ChatInput({
           onInput={(e) => {
             const t = e.target as HTMLTextAreaElement;
             t.style.height = 'auto';
-            t.style.height = `${Math.min(t.scrollHeight, 160)}px`;
+            if (t.value) {
+              t.style.height = `${Math.min(t.scrollHeight, 160)}px`;
+            }
           }}
         />
 
