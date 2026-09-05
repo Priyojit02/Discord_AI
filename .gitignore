@@ -1,0 +1,51 @@
+# Node / Next.js
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/*.tsbuildinfo
+frontend/next-env.d.ts
+
+# Java / Maven
+backend/target/
+backend/*.jar
+backend/*.war
+backend/.flattened-pom.xml
+
+# File Uploads & Local Data
+backend/uploads/
+uploads/
+
+# Environment and Secrets
+*.env
+*.env.local
+*.env.*.local
+.env
+.env.*
+
+# Python & AI Service
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+ai_service/.venv/
+.venv/
+env/
+venv/
+ENV/
+
+# IDE & OS
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

@@ -1,0 +1,234 @@
+@import "tailwindcss";
+
+:root {
+  --bg-primary: #313338;
+  --bg-secondary: #2b2d31;
+  --bg-tertiary: #1e1f22;
+  --bg-accent: #383a40;
+  --bg-hover: #35373c;
+  --bg-active: #404249;
+  --text-primary: #f2f3f5;
+  --text-secondary: #dbdee1;
+  --text-muted: #949ba4;
+  --brand: #5865f2;
+  --brand-hover: #4752c4;
+  --danger: #da373c;
+  --danger-hover: #a12828;
+  --success: #23a55a;
+  --warning: #f0b232;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  user-select: none;
+  overflow-x: hidden;
+  max-width: 100vw;
+  height: 100%;
+}
+
+/* Hide Next.js dev overlay badges that hover over Discord UI controls */
+nextjs-portal,
+[data-next-badge],
+[data-nextjs-toast-wrapper],
+[data-nextjs-dev-tools-button] {
+  display: none !important;
+}
+
+/* Discord Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #1a1b1e;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #111214;
+}
+
+.discord-input {
+  width: 100%;
+  background-color: #1e1f22;
+  color: #f2f3f5;
+  border-radius: 6px;
+  padding: 10px 14px;
+  outline: none;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+}
+.discord-input:focus {
+  border-color: #5865f2;
+}
+.discord-input::placeholder {
+  color: #80848e;
+}
+
+.discord-btn {
+  background-color: #5865f2;
+  color: white;
+  font-weight: 500;
+  border-radius: 4px;
+  padding: 10px 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background-color 0.17s ease, transform 0.1s ease;
+  cursor: pointer;
+}
+.discord-btn:hover:not(:disabled) {
+  background-color: #4752c4;
+}
+.discord-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+.discord-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.discord-btn-secondary {
+  background-color: #4e5058;
+  color: white;
+  font-weight: 500;
+  border-radius: 4px;
+  padding: 10px 18px;
+  transition: background-color 0.17s ease;
+}
+.discord-btn-secondary:hover {
+  background-color: #6d6f78;
+}
+
+.discord-btn-danger {
+  background-color: #da373c;
+  color: white;
+  font-weight: 500;
+  border-radius: 4px;
+  padding: 8px 16px;
+  transition: background-color 0.17s ease;
+}
+.discord-btn-danger:hover {
+  background-color: #a12828;
+}
+
+/* Discord Left Server Pill indicator */
+.pill-indicator {
+  position: absolute;
+  left: 0;
+  width: 4px;
+  background-color: #ffffff;
+  border-radius: 0 4px 4px 0;
+  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* Typing Dots Animation */
+@keyframes discordTypingBounce {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  30% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
+.typing-dot-1 {
+  animation: discordTypingBounce 1.2s infinite ease-in-out;
+}
+.typing-dot-2 {
+  animation: discordTypingBounce 1.2s infinite ease-in-out;
+  animation-delay: 0.2s;
+}
+.typing-dot-3 {
+  animation: discordTypingBounce 1.2s infinite ease-in-out;
+  animation-delay: 0.4s;
+}
+
+/* Speaking glowing border */
+@keyframes speakingPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(35, 165, 90, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(35, 165, 90, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(35, 165, 90, 0);
+  }
+}
+
+.speaking-active {
+  border: 2px solid #23a55a !important;
+  animation: speakingPulse 1.5s infinite;
+}
+
+/* Reaction pill animation */
+.reaction-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background-color: #2b2d31;
+  border: 1px solid #35373c;
+  border-radius: 8px;
+  padding: 3px 8px;
+  font-size: 13px;
+  color: #b5bac1;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+.reaction-pill:hover {
+  background-color: #35373c;
+  border-color: #4e5058;
+}
+.reaction-pill.reacted {
+  background-color: rgba(88, 101, 242, 0.18);
+  border-color: #5865f2;
+  color: #dee0fc;
+}
+
+/* Discord Modals */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  animation: fadeIn 0.15s ease;
+}
+
+.modal-content {
+  background-color: #313338;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  max-width: 480px;
+  width: 90%;
+  animation: scaleIn 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
