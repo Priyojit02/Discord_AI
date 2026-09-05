@@ -6,6 +6,7 @@ import { Message, Reaction } from '@/types';
 import { useAuthStore, useMessageStore, useModalStore } from '@/store';
 import api from '@/lib/api';
 import ServerInviteEmbed from './ServerInviteEmbed';
+import CodeBlockRunner from './CodeBlockRunner';
 
 interface Props {
   message: Message;
@@ -29,14 +30,76 @@ const extractInviteCodes = (text: string): string[] => {
 
 function renderFormattedContent(content: string) {
   if (!content) return null;
+
+  // 1. Detect fenced code blocks: ```lang\ncode```
+  const codeBlockRegex = /```([a-zA-Z0-9_-]*)\n?([\s\S]*?)```/g;
+  const segments: React.ReactNode[] = [];
+  let lastIndex = 0;
+  let match;
+
+  while ((match = codeBlockRegex.exec(content)) !== null) {
+    const textBefore = content.substring(lastIndex, match.index);
+    if (textBefore) {
+      segments.push(renderTextAndInlineCode(textBefore, `text-${lastIndex}`));
+    }
+
+    const lang = match[1] || 'javascript';
+    const code = match[2];
+    segments.push(
+      <CodeBlockRunner key={`code-${match.index}`} code={code} language={lang} />
+    );
+
+    lastIndex = match.index + match[0].length;
+  }
+
+  const remainingText = content.substring(lastIndex);
+  if (remainingText) {
+    segments.push(renderTextAndInlineCode(remainingText, `text-${lastIndex}`));
+  }
+
+  return segments;
+}
+
+function renderTextAndInlineCode(text: string, keyPrefix: string) {
+  const inlineCodeRegex = /(`[^`]+`)/g;
+  const parts = text.split(inlineCodeRegex);
+
+  return (
+    <span key={keyPrefix}>
+      {parts.map((part, idx) => {
+        if (part.startsWith('`') && part.endsWith('`') && part.length > 2) {
+          return (
+            <code
+              key={`${keyPrefix}-inline-${idx}`}
+              style={{
+                backgroundColor: '#1e1f22',
+                color: '#f38686',
+                padding: '2px 5px',
+                borderRadius: '4px',
+                fontSize: '12px',
+                fontFamily: "'JetBrains Mono', Menlo, Consolas, monospace",
+                border: '1px solid rgba(255,255,255,0.08)',
+              }}
+            >
+              {part.slice(1, -1)}
+            </code>
+          );
+        }
+        return renderUrlsAndBold(part, `${keyPrefix}-part-${idx}`);
+      })}
+    </span>
+  );
+}
+
+function renderUrlsAndBold(text: string, keyPrefix: string) {
   const urlRegex = /(https?:\/\/[^\s]+)/g;
-  const parts = content.split(urlRegex);
+  const parts = text.split(urlRegex);
 
   return parts.map((part, index) => {
     if (part.match(urlRegex)) {
       return (
         <a
-          key={index}
+          key={`${keyPrefix}-url-${index}`}
           href={part}
           target="_blank"
           rel="noopener noreferrer"
@@ -57,12 +120,12 @@ function renderFormattedContent(content: string) {
     return boldParts.map((bPart, bIdx) => {
       if (bPart.startsWith('**') && bPart.endsWith('**')) {
         return (
-          <strong key={`${index}-${bIdx}`} style={{ fontWeight: 700, color: '#ffffff' }}>
+          <strong key={`${keyPrefix}-b-${index}-${bIdx}`} style={{ fontWeight: 700, color: '#ffffff' }}>
             {bPart.slice(2, -2)}
           </strong>
         );
       }
-      return <span key={`${index}-${bIdx}`}>{bPart}</span>;
+      return <span key={`${keyPrefix}-t-${index}-${bIdx}`}>{bPart}</span>;
     });
   });
 }

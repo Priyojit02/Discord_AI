@@ -83,5 +83,42 @@ class TestAIServiceMVC(unittest.TestCase):
         self.assertGreaterEqual(data["insights"]["score"], 0)
         self.assertEqual(data["insights"]["activeSpeakers"], 2)
 
+    def test_meeting_recap(self):
+        payload = {
+            "channelName": "voice-lounge",
+            "durationMinutes": 20,
+            "participants": ["Priyojit", "Alex"],
+            "messages": [{"sender": "Priyojit", "content": "Reviewing voice screen sharing and code sandboxes."}]
+        }
+        res = self.client.post("/api/ai/meeting-recap", json=payload)
+        self.assertEqual(res.status_code, 200)
+        data = res.json()
+        self.assertIn("title", data)
+        self.assertIn("executiveSummary", data)
+        self.assertTrue(len(data["keyDecisions"]) > 0)
+        self.assertTrue(len(data["actionItems"]) > 0)
+
+    def test_run_code(self):
+        payload = {
+            "language": "python",
+            "code": "print('Hello from Discord Sandbox!')"
+        }
+        res = self.client.post("/api/ai/run-code", json=payload)
+        self.assertEqual(res.status_code, 200)
+        data = res.json()
+        self.assertIn("Hello from Discord Sandbox!", data["output"])
+        self.assertFalse(data["hasError"])
+
+    def test_explain_code(self):
+        payload = {
+            "language": "javascript",
+            "code": "const add = (a, b) => a + b;"
+        }
+        res = self.client.post("/api/ai/explain-code", json=payload)
+        self.assertEqual(res.status_code, 200)
+        data = res.json()
+        self.assertIn("explanation", data)
+
 if __name__ == "__main__":
     unittest.main()
+

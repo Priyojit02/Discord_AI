@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from ..models.summary import SummarizeRequest, SummarizeResponse
 from ..models.insights import ChannelInsightsRequest, ChannelInsightsResponse
+from ..models.meeting import MeetingRecapRequest, MeetingRecapResponse
 from ..services.summarizer_service import SummarizerService
 from ..services.sentiment_service import SentimentService
 from ..views.response_views import ResponseView
@@ -32,3 +33,14 @@ def get_channel_insights(req: ChannelInsightsRequest):
         summary=summary,
         channel=channel
     )
+
+@router.post("/meeting-recap", response_model=MeetingRecapResponse)
+def get_meeting_recap(req: MeetingRecapRequest):
+    recap = SummarizerService.generate_meeting_recap(
+        channel_name=req.channelName,
+        duration_minutes=req.durationMinutes or 15,
+        participants=req.participants,
+        messages=req.messages,
+    )
+    return MeetingRecapResponse(**recap)
+

@@ -4,6 +4,7 @@ from .reply import SmartRepliesRequest, SmartRepliesResponse
 from .draft import DraftRequest, DraftResponse, DraftStyle
 from .assistant import QueryRequest, QueryResponse
 from .insights import ChannelInsightsRequest, ChannelInsightsResponse, SentimentMetric
+from .meeting import MeetingRecapRequest, MeetingRecapResponse, CodeRunRequest, CodeRunResponse
 
 __all__ = [
     "MessageItem",
@@ -20,4 +21,9 @@ __all__ = [
     "ChannelInsightsRequest",
     "ChannelInsightsResponse",
     "SentimentMetric",
+    "MeetingRecapRequest",
+    "MeetingRecapResponse",
+    "CodeRunRequest",
+    "CodeRunResponse",
 ]
+
