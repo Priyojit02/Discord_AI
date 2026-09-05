@@ -7,6 +7,7 @@ import { useAuthStore, useMessageStore, useModalStore } from '@/store';
 import api from '@/lib/api';
 import ServerInviteEmbed from './ServerInviteEmbed';
 import CodeBlockRunner from './CodeBlockRunner';
+import PollWidget, { PollOption } from './PollWidget';
 
 interface Props {
   message: Message;
@@ -14,6 +15,52 @@ interface Props {
   isConsecutive?: boolean;
   onUpdate: (msg: Message) => void;
 }
+
+interface ExtractedPoll {
+  question: string;
+  options: PollOption[];
+}
+
+const extractPollData = (content: string): ExtractedPoll | null => {
+  if (!content) return null;
+  if (!content.includes('📊') && !content.toLowerCase().includes('poll')) return null;
+  if (!content.includes('1️⃣') || !content.includes('2️⃣')) return null;
+
+  const parts = content.split(/(1️⃣|2️⃣|3️⃣|4️⃣|5️⃣)/);
+  if (parts.length < 5) return null;
+
+  // Extract question from text before first option
+  let question = parts[0]
+    .replace(/📊|\*\*/g, '')
+    .replace(/Community Poll:?/i, '')
+    .replace(/Poll:?/i, '')
+    .replace(/[━\-_]+/g, '')
+    .trim() || 'Community Poll';
+
+  const options: PollOption[] = [];
+  let currentId = 1;
+
+  for (let i = 1; i < parts.length; i += 2) {
+    const emoji = parts[i];
+    let rawLabel = parts[i + 1] || '';
+    rawLabel = rawLabel
+      .split(/\*Cast your vote/i)[0]
+      .replace(/[━\-_]+/g, '')
+      .replace(/^\s*\*\*/, '')
+      .replace(/\*\*\s*$/, '')
+      .trim();
+
+    if (rawLabel) {
+      options.push({
+        id: currentId++,
+        emoji,
+        label: rawLabel,
+      });
+    }
+  }
+
+  return options.length >= 2 ? { question, options } : null;
+};
 
 const extractInviteCodes = (text: string): string[] => {
   if (!text) return [];
@@ -404,30 +451,40 @@ export default function ChatMessage({
             </div>
           ) : (
             <>
-              <div
-                style={{
-                  fontSize: '14.5px',
-                  lineHeight: '1.45',
-                  wordBreak: 'break-word',
-                  color: message.deleted ? '#80848e' : '#dbdee1',
-                  fontStyle: message.deleted ? 'italic' : 'normal',
-                  userSelect: message.deleted ? 'none' : 'text',
-                }}
-              >
-                {message.deleted ? message.content : renderFormattedContent(displayContent)}
-                {isConsecutive && message.edited && !message.deleted && (
-                  <span
-                    style={{
-                      fontSize: '10px',
-                      color: '#949ba4',
-                      marginLeft: '6px',
-                      userSelect: 'none',
-                    }}
-                  >
-                    (edited)
-                  </span>
-                )}
-              </div>
+              {!message.deleted && extractPollData(message.content) ? (
+                <PollWidget
+                  message={message}
+                  messageKey={messageKey}
+                  question={extractPollData(message.content)!.question}
+                  options={extractPollData(message.content)!.options}
+                />
+              ) : (
+                <div
+                  style={{
+                    fontSize: '14.5px',
+                    lineHeight: '1.45',
+                    wordBreak: 'break-word',
+                    whiteSpace: 'pre-wrap',
+                    color: message.deleted ? '#80848e' : '#dbdee1',
+                    fontStyle: message.deleted ? 'italic' : 'normal',
+                    userSelect: message.deleted ? 'none' : 'text',
+                  }}
+                >
+                  {message.deleted ? message.content : renderFormattedContent(displayContent)}
+                  {isConsecutive && message.edited && !message.deleted && (
+                    <span
+                      style={{
+                        fontSize: '10px',
+                        color: '#949ba4',
+                        marginLeft: '6px',
+                        userSelect: 'none',
+                      }}
+                    >
+                      (edited)
+                    </span>
+                  )}
+                </div>
+              )}
 
               {/* Server Invite Embed Cards */}
               {!message.deleted &&

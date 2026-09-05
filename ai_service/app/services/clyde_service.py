@@ -42,12 +42,53 @@ class ClydeBotService:
             reply = DiscordFormatter.format_announcement(f"📢 {topic.upper()}", body, channel_name)
             return (reply, ["Copy announcement", "Schedule another time", "Add voice link"], model_name)
 
-        # 3. Specialized Command: Poll
+        # 3. Specialized Command: Poll (4 Separate Options)
         if "poll" in lower or "vote" in lower:
-            topic = re.sub(r"^(create a poll|poll|vote)\s*:?", "", clean_prompt, flags=re.IGNORECASE).strip() or "Community Choice"
-            options = ["Option A (Count me in! 🔥)", "Option B (Need a different time ⏱️)", "Option C (Suggest alternative 💡)"]
+            topic = re.sub(r"^(/ai\s+)?(create a poll|poll|vote)\s*:?", "", clean_prompt, flags=re.IGNORECASE).strip() or "Community Choice"
+            options = None
+            llm = get_llm(temperature=0.3, max_tokens=300)
+            if llm:
+                try:
+                    p = f"""Generate 4 distinct, engaging voting options for a Discord community poll on: "{topic}".
+Return ONLY a valid JSON array of 4 strings with emojis, for example:
+["Option 1 with emoji", "Option 2 with emoji", "Option 3 with emoji", "Option 4 with emoji"]
+"""
+                    res = llm.invoke(p)
+                    raw = res.content if isinstance(res.content, str) else str(res.content)
+                    match = re.search(r"\[.*\]", raw, re.DOTALL)
+                    if match:
+                        import json
+                        parsed = json.loads(match.group(0))
+                        if len(parsed) >= 4:
+                            options = parsed[:4]
+                except Exception as e:
+                    logger.warning(f"Bedrock poll generation failed: {e}")
+
+            if not options:
+                if any(w in topic.lower() for w in ["play", "game", "gaming"]):
+                    options = [
+                        "Option A: Valorant / Competitive FPS 🎯",
+                        "Option B: Minecraft / Survival ⛏️",
+                        "Option C: Party & Jackbox Games 🚀",
+                        "Option D: Chill & Hangout in Voice 🎙️",
+                    ]
+                elif any(w in topic.lower() for w in ["time", "when", "meet", "schedule"]):
+                    options = [
+                        "Option A: Tonight at 8:00 PM 🕗",
+                        "Option B: Tonight at 9:30 PM 🕤",
+                        "Option C: Tomorrow Evening 🌅",
+                        "Option D: This Weekend 🗓️",
+                    ]
+                else:
+                    options = [
+                        "Option A: Strongly Agree 🔥",
+                        "Option B: Open to Discussion 💡",
+                        "Option C: Prefer Alternative ⏱️",
+                        "Option D: Need More Details 🤔",
+                    ]
+
             reply = DiscordFormatter.format_poll(topic, options)
-            return (reply, ["Create another poll", "Add 4th option", "Close poll"], model_name)
+            return (reply, ["Vote Option 1", "Vote Option 2", "Close poll"], model_name)
 
         # 4. AWS Bedrock LLM Generation for General Queries & Assistance
         llm = get_llm(temperature=0.3, max_tokens=1000)

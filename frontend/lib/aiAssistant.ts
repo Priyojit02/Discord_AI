@@ -232,13 +232,13 @@ React with 🔥 or 🎉 below to confirm you're coming!
   }
 
   if (lower.includes('poll') || lower.includes('vote')) {
-    return `📊 **Community Poll: ${cleanPrompt.replace(/^(create a poll|poll)\s*:?/i, '').trim() || 'Vote below!'}**
-
-1️⃣ **Option A** (Strongly in favor)
-2️⃣ **Option B** (Need more details)
-3️⃣ **Option C** (Alternative suggestion)
-
-*Cast your vote by reacting with the corresponding emoji!*`;
+    const question = cleanPrompt.replace(/^(create a poll|poll|vote)\s*:?/i, '').trim() || 'Community Choice';
+    return `📊 **Community Poll: ${question}**
+1️⃣ **Option A: Valorant / Competitive FPS 🎯**
+2️⃣ **Option B: Minecraft / Cooperative Survival ⛏️**
+3️⃣ **Option C: Party & Jackbox Games 🚀**
+4️⃣ **Option D: Chill & Chat in General Voice 🎙️**
+*Cast your vote by clicking or reacting with 1️⃣, 2️⃣, 3️⃣, or 4️⃣!*`;
   }
 
   if (lower.includes('react') || lower.includes('webrtc') || lower.includes('websocket') || lower.includes('code') || lower.includes('typescript') || lower.includes('python')) {
