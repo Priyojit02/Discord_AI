@@ -43,10 +43,15 @@ export default function ChatInput({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const typingTimeout = useRef<NodeJS.Timeout | null>(null);
 
-  // Auto-reset textarea height back to 1-line when message is cleared or empty
+  // Auto-reset textarea height back to 1-line (24px) when cleared, or dynamically adjust
   useEffect(() => {
-    if (!content && textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
+    if (textareaRef.current) {
+      if (!content) {
+        textareaRef.current.style.height = '24px';
+      } else {
+        textareaRef.current.style.height = '24px';
+        textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 160)}px`;
+      }
     }
   }, [content]);
 
@@ -127,7 +132,7 @@ export default function ChatInput({
       await onSend(content.trim(), fileUrl, fileName);
       setContent('');
       if (textareaRef.current) {
-        textareaRef.current.style.height = 'auto';
+        textareaRef.current.style.height = '24px';
       }
       sendTyping(false);
     } catch (err) {
@@ -538,7 +543,8 @@ export default function ChatInput({
             outline: 'none',
             resize: 'none',
             fontSize: '14.5px',
-            height: 'auto',
+            minHeight: '24px',
+            height: '24px',
             maxHeight: '160px',
             lineHeight: '1.4',
             paddingTop: '4px',
@@ -553,7 +559,7 @@ export default function ChatInput({
           rows={1}
           onInput={(e) => {
             const t = e.target as HTMLTextAreaElement;
-            t.style.height = 'auto';
+            t.style.height = '24px';
             if (t.value) {
               t.style.height = `${Math.min(t.scrollHeight, 160)}px`;
             }
