@@ -434,4 +434,4 @@ When leaving a voice channel, ending a call, or logging out, Discord web apps mu
 
 ## 📄 License
 
-This project is licensed under the MIT License.
+This project is licensed under the My License.
