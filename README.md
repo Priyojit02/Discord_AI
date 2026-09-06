@@ -64,6 +64,20 @@ echo "AWS_BEARER_TOKEN_BEDROCK=your-key-here" > ai_service/.env && chmod +x star
 
 ---
 
+## 📸 Visual Showcase & Screenshots
+
+| 🧠 Smart Inbox AI Assistant (Clyde Copilot) | 🎙️ Real-Time WebRTC Voice Channel Stage |
+| :---: | :---: |
+| ![Smart Inbox AI Assistant](docs/screenshots/smart_inbox_ai.png) | ![WebRTC Voice Channel Stage](docs/screenshots/webrtc_voice_stage.png) |
+| *Clyde AI Copilot with Smart Replies, Summarization, and Quick Prompts* | *Live WebRTC voice stage with active speaking rings and stream controls* |
+
+| 💬 Direct Messages & Rich Server Invites | 🔗 Shareable Server Invite System |
+| :---: | :---: |
+| ![Direct Message & Server Invite Embed](docs/screenshots/dm_invite_embed.png) | ![Server Invite Modal](docs/screenshots/invite_friends_modal.png) |
+| *Interactive Server Invite Cards in Direct Messages with quick join* | *Instant shareable invite links and direct friend invitation modal* |
+
+---
+
 ## 🏛️ High-Level Design (HLD)
 
 ### 1. System Topology & Tier Architecture
