@@ -344,8 +344,3 @@ curl -s -I http://localhost:3000
   ```
   Immediately shutting down browser indicators and protecting user privacy.
 
----
-
-## 📄 License
-
-This project is licensed under the MIT License.
